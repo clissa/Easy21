@@ -10,7 +10,7 @@ def sample_card(n):
     p_red = 1/3  # p_black = 1 - p_red = 2/3
 
     # sample card
-    values = random.sample(range(1, 10), n)
+    values = random.sample(range(1, 11), n)
 
     # sample color
     colors = ["red" if random.random() < p_red else "black" for i in range(n)]
