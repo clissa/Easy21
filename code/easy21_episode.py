@@ -21,12 +21,13 @@ def run_episode():
     print("--" * 30)
 
     # loop until the next_state is terminal
-    while state != "terminal":
+    state_encoding = "initial"
+    while state_encoding != "terminal":
         # sample the action
         action = policy(s=state)
 
         # simulate the environment
-        new_state, reward = step(s=state, a=action)
+        state, reward = step(s=state, a=action)
 
         # update history
         state_df = pd.DataFrame(
@@ -34,7 +35,8 @@ def run_episode():
         history = history.append(state_df, ignore_index=True)
 
         # override old state
-        state = new_state
+        if "terminal" in [state.dealer_score, state.player_score] or "draw" in [state.dealer_score, state.player_score]:
+            state_encoding = "terminal"
 
     print("The final reward is {}".format(reward))
     print("--" * 30)

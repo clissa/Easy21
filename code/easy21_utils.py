@@ -22,7 +22,7 @@ def sample_card(n):
     values = [random.randint(1, 10) for i in range(n)]
 
     # sample color
-    colors = [(i, "red") if random.random() < p_red else (i, "black") for i in range(n)]
+    colors = ["red" if random.random() < p_red else "black" for i in range(n)]
 
     sampled_cards = pd.DataFrame(data={"value": values, "color": colors})
     return sampled_cards
@@ -58,7 +58,7 @@ def step(s, a):
             reward = -1
             print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
                   "The Player went bust.\n".format(s.dealer_score, s.player_score))
-            state = "terminal"
+            s.player_score = "terminal"
         else:
             reward = 0
             state = s
@@ -76,24 +76,25 @@ def step(s, a):
             reward = 1
             print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
                   "The Dealer went bust.\n".format(s.dealer_score, s.player_score))
-            state = "terminal"
+            s.dealer_score = "terminal"
         else:
             if s.player_score > s.dealer_score:
                 reward = 1
                 print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
                       "The Player won.\n".format(s.dealer_score, s.player_score))
-                state = "terminal"
+                s.dealer_score = "terminal"
             elif s.player_score == s.dealer_score:
                 reward = 0
                 print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
                       "Draw.\n".format(s.dealer_score, s.player_score))
-                state = "terminal"
+                s.dealer_score = "draw"
+                s.player_score = "draw"
             else:
                 reward = -1
                 print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
                       "The Dealer won.\n".format(s.dealer_score, s.player_score))
-                state = "terminal"
-    return state, reward
+                s.player_score = "terminal"
+    return s, reward
 
 
 def policy(s, threshold=18):
