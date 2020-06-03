@@ -1,7 +1,6 @@
-
-
 class State:
     """ Class for representing any state of the Easy21 environment """
+
     def __init__(self):
         import random
         self.dealer_score = random.randint(1, 10)
@@ -17,13 +16,13 @@ def sample_card(n):
     import random
     import pandas as pd
 
-    p_red = 1/3  # p_black = 1 - p_red = 2/3
+    p_red = 1 / 3  # p_black = 1 - p_red = 2/3
 
     # sample card
-    values = random.sample(range(1, 11), n)
+    values = [random.randint(1, 10) for i in range(n)]
 
     # sample color
-    colors = ["red" if random.random() < p_red else "black" for i in range(n)]
+    colors = [(i, "red") if random.random() < p_red else (i, "black") for i in range(n)]
 
     sampled_cards = pd.DataFrame(data={"value": values, "color": colors})
     return sampled_cards
@@ -36,7 +35,6 @@ def step(s, a):
     :param a: Player's action (either hit or stick)
     :return: tuple with next state and reward
     """
-
     # input checks
     if s.dealer_score < 1 or s.dealer_score > 10:
         raise ValueError("Invalid input argument for Dealer's initial score: must be an integer between 1 and 10.")
@@ -60,10 +58,10 @@ def step(s, a):
             reward = -1
             print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
                   "The Player went bust.\n".format(s.dealer_score, s.player_score))
-            return "terminal", reward
+            state = "terminal"
         else:
             reward = 0
-            return s, reward
+            state = s
     else:
         # roll Dealer's trajectory
         while 1 <= s.dealer_score < 17:
@@ -78,23 +76,25 @@ def step(s, a):
             reward = 1
             print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
                   "The Dealer went bust.\n".format(s.dealer_score, s.player_score))
-            return "terminal", reward
+            state = "terminal"
         else:
             if s.player_score > s.dealer_score:
                 reward = 1
                 print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
                       "The Player won.\n".format(s.dealer_score, s.player_score))
-                return "terminal", reward
+                state = "terminal"
             elif s.player_score == s.dealer_score:
                 reward = 0
                 print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
                       "Draw.\n".format(s.dealer_score, s.player_score))
-                return "terminal", reward
+                state = "terminal"
             else:
                 reward = -1
                 print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
                       "The Dealer won.\n".format(s.dealer_score, s.player_score))
-                return "terminal", reward
+                state = "terminal"
+    return state, reward
+
 
 def policy(s, threshold=18):
     """
