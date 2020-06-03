@@ -1,4 +1,4 @@
-def main():
+def run_episode():
     """
     Simulate one entire episode of Easy21 game.
     :return: Final reward
@@ -56,6 +56,6 @@ if __name__ == "__main__":
 
     for i in range(n_episodes):
         print("\nEPISODE {}:".format(i + 1))
-        history = main()
+        history = run_episode()
         outpath = save_path / "episode{}.csv".format(i + 1)
         history.to_csv(outpath, index_label="time")
