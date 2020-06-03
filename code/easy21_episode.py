@@ -8,33 +8,33 @@ def main():
     sys.path.append(os.getcwd() + "/code")
 
     import random
-    from easy21_utils import step
-
-    # sample inital cards
-    dealer_card = random.sample(range(1, 11), 1)[0]
-    player_card = random.sample(range(1, 11), 1)[0]
+    from easy21_utils import step, State
 
     # initialize the state
-    initial_state = (dealer_card, player_card)
-    print("Dealer started with {},\nwhile player started with {}.".format(dealer_card, player_card))
+    state = State()
+    print("Dealer started with {} and Player started with {}.".format(state.dealer_score, state.player_score))
+    print("--"*30)
 
     # loop until the next_state is terminal
-    next_state = initial_state
-    while next_state != "terminal":
+    while state != "terminal":
         # sample the action
         # TODO implement policy function that returns directly the action
-        if next_state[1] < 17:
+        if state.player_score < 17:
             action = "hit"
         else:
             action = "stick"
 
-        next_state, reward = step(s=next_state, a=action)
-        if next_state != "terminal":
-        print("Dealer score  = {}; Player score = {}".format(next_state[0], next_state[1]))
+        state, reward = step(s=state, a=action)
 
-    print("The final reward is {}\n\n".format(reward))
+    print("The final reward is {}".format(reward))
+    print("--"*30)
 
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    n_episodes = int(sys.argv[1])
+    for i in range(n_episodes):
+        print("\nEPISODE {}:".format(i+1))
+        main()
+

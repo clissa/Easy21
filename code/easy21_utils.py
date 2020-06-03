@@ -1,6 +1,17 @@
-def sample_card(n):
-    """Sample n cards according to the rules of Easy21
+# TODO implement class State with two attributes: Player and Dealer score initialized at instantiation
 
+
+class State:
+    """ Class for representing any state of the Easy21 environment """
+    def __init__(self):
+        import random
+        self.dealer_score = random.randint(1, 10)
+        self.player_score = random.randint(1, 10)
+
+
+def sample_card(n):
+    """
+    Sample n cards according to the rules of Easy21
     :param n: number of cards to draw
     :return: tuple with card and color
     """
@@ -20,25 +31,20 @@ def sample_card(n):
 
 
 def step(s, a):
-    """ Simulate one step of the environment given the initial state and the player's action.
-
-    :param s: tuple with dealers first card and player's sum (1 to 21)
-    :param a: player's action (either hit or stick)
+    """
+    Simulate one step of the environment given the initial state and the Player's action.
+    :param s: State object containing Dealers first card and Player's sum (1 to 21)
+    :param a: Player's action (either hit or stick)
     :return: tuple with next state and reward
     """
-    dealer_score = s[0]
-    player_score = s[1]
 
     # input checks
-    if dealer_score < 1 or dealer_score > 10:
-        print("Problem here0")
-        raise ValueError("Invalid input argument for dealer's initial score: must be an integer between 1 and 10.")
-    if player_score < 1 or player_score > 21:
-        print("Problem here1")
-        raise ValueError("Invalid input argument for player's initial score: must be an integer between 1 and 21.")
+    if s.dealer_score < 1 or s.dealer_score > 10:
+        raise ValueError("Invalid input argument for Dealer's initial score: must be an integer between 1 and 10.")
+    if s.player_score < 1 or s.player_score > 21:
+        raise ValueError("Invalid input argument for Player's initial score: must be an integer between 1 and 21.")
     if a not in ["hit", "stick"]:
-        print("Problem here2")
-        raise ValueError("Invalid input argument for player's action: specify one between \"hit\" or \"stick\".")
+        raise ValueError("Invalid input argument for Player's action: specify one between \"hit\" or \"stick\".")
 
     if a == "hit":
         # sample the next card
@@ -46,42 +52,47 @@ def step(s, a):
 
         # update the sum
         if card.loc[0, "color"] == "black":
-            player_score += card.loc[0, "value"]
+            s.player_score += card.loc[0, "value"]
         else:
-            player_score -= card.loc[0, "value"]
+            s.player_score -= card.loc[0, "value"]
 
         # compute the reward
-        if player_score < 1 or player_score > 21:
+        if s.player_score < 1 or s.player_score > 21:
             reward = -1
+            print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
+                  "The Player went bust.\n".format(s.dealer_score, s.player_score))
+            return "terminal", reward
         else:
             reward = 0
-
-        # update the next state
-        if reward > -1:
-            next_state = (s[0], player_score)
-        else:
-            next_state = "terminal"
+            return s, reward
     else:
-        # roll dealer's trajectory
-        while 1 <= dealer_score < 17:
+        # roll Dealer's trajectory
+        while 1 <= s.dealer_score < 17:
             card = sample_card(1)
             if card.loc[0, "color"] == 'black':
-                dealer_score += card.loc[0, "value"]
+                s.dealer_score += card.loc[0, "value"]
             else:
-                dealer_score -= card.loc[0, "value"]
+                s.dealer_score -= card.loc[0, "value"]
 
         # compute the reward
-        if dealer_score < 1 or dealer_score > 21:
+        if s.dealer_score < 1 or s.dealer_score > 21:
             reward = 1
+            print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
+                  "The Dealer went bust.\n".format(s.dealer_score, s.player_score))
+            return "terminal", reward
         else:
-            if player_score > dealer_score:
+            if s.player_score > s.dealer_score:
                 reward = 1
-            elif player_score == dealer_score:
+                print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
+                      "The Player won.\n".format(s.dealer_score, s.player_score))
+                return "terminal", reward
+            elif s.player_score == s.dealer_score:
                 reward = 0
+                print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
+                      "Draw.\n".format(s.dealer_score, s.player_score))
+                return "terminal", reward
             else:
                 reward = -1
-
-        # update the next state as terminal
-        next_state = "terminal"
-
-    return next_state, reward
+                print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
+                      "The Dealer won.\n".format(s.dealer_score, s.player_score))
+                return "terminal", reward
