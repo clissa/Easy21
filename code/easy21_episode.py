@@ -8,7 +8,7 @@ def main():
     sys.path.append(os.getcwd() + "/code")
 
     import random
-    from easy21_utils import step, State
+    from easy21_utils import step, State, policy
 
     # initialize the state
     state = State()
@@ -18,11 +18,7 @@ def main():
     # loop until the next_state is terminal
     while state != "terminal":
         # sample the action
-        # TODO implement policy function that returns directly the action
-        if state.player_score < 17:
-            action = "hit"
-        else:
-            action = "stick"
+        action = policy(s=state)
 
         state, reward = step(s=state, a=action)
 

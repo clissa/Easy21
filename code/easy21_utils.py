@@ -1,4 +1,3 @@
-# TODO implement class State with two attributes: Player and Dealer score initialized at instantiation
 
 
 class State:
@@ -96,3 +95,15 @@ def step(s, a):
                 print("Game finished with scores:\nDealer: {};\tPlayer: {}\n"
                       "The Dealer won.\n".format(s.dealer_score, s.player_score))
                 return "terminal", reward
+
+def policy(s, threshold=18):
+    """
+    Return the Player's action given the current state of the environment.
+    :param s: current state
+    :return: action (\"hit\" or \"stick\")
+    """
+    if s.player_score < threshold:
+        action = "hit"
+    else:
+        action = "stick"
+    return action
