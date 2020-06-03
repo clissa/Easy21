@@ -1,7 +1,7 @@
 def run_episode():
     """
     Simulate one entire episode of Easy21 game.
-    :return: Final reward
+    :return: Final pandas.DataFrame with the history of the game
     """
     import os
     import sys
