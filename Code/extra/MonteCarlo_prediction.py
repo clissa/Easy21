@@ -79,9 +79,6 @@ def mc_state_policy_evaluation_incremental(state, mc_type, episodes_path, alpha=
         state_occurrences = episode_history[
             (episode_history.dealer_score == state.dealer_score) & (episode_history.player_score == state.player_score)]
 
-        # initialize episode return
-        g_t = 0
-
         if state_occurrences.shape[0] == 0:
             continue
         elif mc_type == "first":  # first-visit MC
@@ -90,7 +87,7 @@ def mc_state_policy_evaluation_incremental(state, mc_type, episodes_path, alpha=
 
             # compute return
             first_occurrence_time = state_occurrences.index[0]
-            g_t += episode_history[first_occurrence_time:].reward.sum()
+            g_t = episode_history[first_occurrence_time:].reward.sum()
 
             # update value function
             if alpha is not None:
@@ -101,16 +98,13 @@ def mc_state_policy_evaluation_incremental(state, mc_type, episodes_path, alpha=
         elif mc_type == "every":
             # compute return
             for first_occurrence_time in state_occurrences.index:
-                # re-initialize return for each state occurrence
-                g_t = 0
+
                 n_state += 1
-                g_t += episode_history[first_occurrence_time:].reward.sum()
+                g_t = episode_history[first_occurrence_time:].reward.sum()
 
                 # update value function
                 if alpha is not None:
                     state.value_function += alpha * (g_t - state.value_function)
                 else:
                     state.value_function += 1 / n_state * (g_t - state.value_function)
-                    print(state.value_function, n_state, g_t)
-
     return
