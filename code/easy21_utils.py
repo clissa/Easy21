@@ -1,10 +1,17 @@
 class State:
     """ Class for representing any state of the Easy21 environment """
 
-    def __init__(self):
+    def __init__(self, dealer_score=None, player_score=None, value_function=0):
         import random
-        self.dealer_score = random.randint(1, 10)
-        self.player_score = random.randint(1, 10)
+        if dealer_score is None:
+            self.dealer_score = random.randint(1, 10)
+        else:
+            self.dealer_score = dealer_score
+        if player_score is None:
+            self.player_score = random.randint(1, 10)
+        else:
+            self.player_score = player_score
+        self.value_function = value_function
 
 
 def sample_card(n):
@@ -22,7 +29,7 @@ def sample_card(n):
     values = [random.randint(1, 10) for i in range(n)]
 
     # sample color
-    colors = ["red" if random.random() < p_red else "black" for i in range(n)]
+    colors = ["red" if random.random() < p_red else "black" for _ in range(n)]
 
     sampled_cards = pd.DataFrame(data={"value": values, "color": colors})
     return sampled_cards
