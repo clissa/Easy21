@@ -3,12 +3,8 @@ def run_episode():
     Simulate one entire episode of Easy21 game.
     :return: Final pandas.DataFrame with the history of the game
     """
-    import os
-    import sys
-    sys.path.append(os.getcwd() + "/code")
-
     import pandas as pd
-    from easy21_utils import step, State, policy
+    from Code.easy21_utils import step, State, policy
 
     # initialize the state
     state = State()
