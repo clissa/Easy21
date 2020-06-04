@@ -55,7 +55,7 @@ def mc_state_policy_evaluation_final_update(state, mc_type, episodes_path):
     return v_state
 
 
-def mc_state_policy_evaluation_incremental(state, mc_type, episodes_path):
+def mc_state_policy_evaluation_incremental(state, mc_type, episodes_path, alpha=None):
     """
     Evaluate a policy using incremental-update Monte Carlo for the specified state reading episodes from .csv files.
     :param state: the state for which the value function is computed
@@ -105,8 +105,9 @@ def mc_state_policy_evaluation_incremental(state, mc_type, episodes_path):
 
         # update value function
         # TODO implement non-stationary version with alpha weight
-        v_state += 1/n_state * (g_t - v_state)
-        print(v_state, n_state, g_t)
-        # v_state = g_t / n_state
+        if alpha is not None:
+            v_state += alpha * (g_t - v_state)
+        else:
+            v_state += 1/n_state * (g_t - v_state)
 
     return v_state
