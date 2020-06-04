@@ -28,28 +28,27 @@ def mc_state_policy_evaluation_final_update(state, mc_type, episodes_path):
         episode_history = episode_history.replace(["terminal", "draw"], [22, -1]).astype(
             {"dealer_score": int, "player_score": int})
 
-        state_occurences = episode_history[
+        state_occurrences = episode_history[
             (episode_history.dealer_score == state.dealer_score) & (episode_history.player_score == state.player_score)]
 
-        if state_occurences.shape[0] == 0:
+        if state_occurrences.shape[0] == 0:
            continue
         elif mc_type == "first":  # first-visit MC
             # update state frequency counter
             n_state += 1
 
             # compute return
-            first_occurence_time = state_occurences.index[0]
+            first_occurence_time = state_occurrences.index[0]
             g_t += episode_history[first_occurence_time:].reward.sum()
         elif mc_type == "every":
             # update state frequency counter
-            n_state += state_occurences.shape[0]
+            n_state += state_occurrences.shape[0]
 
             # compute return
-            for first_occurence_time in state_occurences.index:
+            for first_occurence_time in state_occurrences.index:
                 g_t += episode_history[first_occurence_time:].reward.sum()
 
     # update value function
-    # TODO implement non-stationary version with alpha weight
     v_state = g_t / n_state
 
     return v_state
@@ -69,9 +68,6 @@ def mc_state_policy_evaluation_incremental(state, mc_type, episodes_path, alpha=
     # initialize state counter
     n_state = 0
 
-    # initialize value function
-    v_state = 0
-
     for path in Path(episodes_path).iterdir():
         # read episode history
         episode_history = pd.read_csv(path, index_col="time")
@@ -80,34 +76,41 @@ def mc_state_policy_evaluation_incremental(state, mc_type, episodes_path, alpha=
         episode_history = episode_history.replace(["terminal", "draw"], [22, -1]).astype(
             {"dealer_score": int, "player_score": int})
 
-        state_occurences = episode_history[
+        state_occurrences = episode_history[
             (episode_history.dealer_score == state.dealer_score) & (episode_history.player_score == state.player_score)]
 
         # initialize episode return
         g_t = 0
 
-        if state_occurences.shape[0] == 0:
+        if state_occurrences.shape[0] == 0:
             continue
         elif mc_type == "first":  # first-visit MC
             # update state frequency counter
             n_state += 1
 
             # compute return
-            first_occurence_time = state_occurences.index[0]
-            g_t += episode_history[first_occurence_time:].reward.sum()
+            first_occurrence_time = state_occurrences.index[0]
+            g_t += episode_history[first_occurrence_time:].reward.sum()
+
+            # update value function
+            if alpha is not None:
+                state.value_function += alpha * (g_t - state.value_function)
+            else:
+                state.value_function += 1 / n_state * (g_t - state.value_function)
+
         elif mc_type == "every":
-            # update state frequency counter
-            n_state += state_occurences.shape[0]
-
             # compute return
-            for first_occurence_time in state_occurences.index:
-                g_t += episode_history[first_occurence_time:].reward.sum()
+            for first_occurrence_time in state_occurrences.index:
+                # re-initialize return for each state occurrence
+                g_t = 0
+                n_state += 1
+                g_t += episode_history[first_occurrence_time:].reward.sum()
 
-        # update value function
-        # TODO implement non-stationary version with alpha weight
-        if alpha is not None:
-            v_state += alpha * (g_t - v_state)
-        else:
-            v_state += 1/n_state * (g_t - v_state)
+                # update value function
+                if alpha is not None:
+                    state.value_function += alpha * (g_t - state.value_function)
+                else:
+                    state.value_function += 1 / n_state * (g_t - state.value_function)
+                    print(state.value_function, n_state, g_t)
 
-    return v_state
+    return
