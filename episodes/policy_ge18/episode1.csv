@@ -1,0 +1,5 @@
+time,dealer_score,player_score,reward
+0,2,4,0
+1,8,11,0
+2,8,11,0
+3,2,terminal,-1
