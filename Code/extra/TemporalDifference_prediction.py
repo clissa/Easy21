@@ -23,20 +23,19 @@ def td_policy_evaluation(state, gamma, alpha, episodes_path, V_s=None):
         else:
             # compute expected return
             for first_occurrence_time in state_occurrences.index:
+                current_state = episode_history.loc[first_occurrence_time]
+                next_state = episode_history.loc[first_occurrence_time + 1]
 
                 # retrieve expected return for next state
-                next_state = State(episode_history.loc[first_occurrence_time].dealer_score,
-                                   episode_history.loc[first_occurrence_time].player_score)
-                next_state.value_function = V_s.get((episode_history.loc[first_occurrence_time + 1].dealer_score,
-                                                     episode_history.loc[first_occurrence_time + 1].player_score), 0)
+                next_state = State(next_state.dealer_score, next_state.player_score)
+                next_state.value_function = V_s.get((next_state.dealer_score, next_state.player_score), 0)
                 # expected return
-                g_t = episode_history.loc[first_occurrence_time].reward + gamma * next_state.value_function
+                g_t = current_state.reward + gamma * next_state.value_function
 
                 # update value function of the state
                 state.value_function += alpha * (g_t - state.value_function)
 
                 # update value function dictionary
-                V_s[(episode_history.loc[first_occurrence_time].dealer_score,
-                                   episode_history.loc[first_occurrence_time].player_score)] = state.value_function
+                V_s[(current_state.dealer_score, current_state.player_score)] = state.value_function
 
     return
