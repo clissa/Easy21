@@ -15,6 +15,10 @@ starting from the current state and the action of the player.
 The script `easy21_episode.py` provides a wrapper to the step() routine to run a full episode of Easy21.
 Furthermore, it keeps track of the evolution of the game, returning a pandas DataFrame containing the history from initialization to terminal state.
 
+The folder `Code/extra` stores additional implementation not specifically required for the assignment, 
+namely *first/every-visit Monte Carlo policy evaluation*, both with final and incremental updates, and 
+*Temporal Difference for 1-step look-ahead*, i.e., TD(0).
+
 ### Simulate games
 In order to simulate multiple games it is possible to run *easy21_episode.py* from command line as follows:
 
